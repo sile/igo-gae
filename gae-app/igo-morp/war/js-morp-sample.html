@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="http://igo-morp.appspot.com/igo.js"></script>
+
+    <!-- callback function -->
+    <script type="text/javascript" language="javascript">
+      <!--
+        function parse_callback(rlt) {
+        var result =document.getElementById("result");
+        var text="";
+        for(var i=0; i < rlt.length; i++)
+          text += rlt[i][0] + "\t" + rlt[i][1] + "\n";
+        result.innerHTML = text;
+      }
+
+      function parse() {
+        var text=document.getElementById("text").value;
+        igo_parse(text, "parse_callback");
+        return false;
+      }
+      -->
+    </script>
+    
+    <title>形態素解析サンプル</title>
+  </head>
+  <body>
+    <!-- input text -->
+    <form onsubmit="return parse()">
+      <textarea id="text" cols="30" rows="10"></textarea>
+      <br />
+      <input type="submit"  value="analyze" >
+    </form>
+    <br />
+    
+    <!-- result -->
+    <pre id="result"></pre>
+  </body>
+</html>
+

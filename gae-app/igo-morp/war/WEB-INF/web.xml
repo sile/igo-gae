@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+  <servlet>
+    <servlet-name>wakati</servlet-name>
+    <servlet-class>WakatiServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>wakati</servlet-name>
+    <url-pattern>/wakati</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>parse</servlet-name>
+    <servlet-class>ParseServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>parse</servlet-name>
+    <url-pattern>/parse</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>wakati_jsonp</servlet-name>
+    <servlet-class>WakatiJSONPServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>wakati_jsonp</servlet-name>
+    <url-pattern>/wakati_jsonp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>parse_jsonp</servlet-name>
+    <servlet-class>ParseJSONPServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>parse_jsonp</servlet-name>
+    <url-pattern>/parse_jsonp</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>igo.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
