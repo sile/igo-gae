@@ -1,5 +1,6 @@
 <project name="igo-morp" default="datanucleusenhance">
-  <property name="sdk.dir" location="../.." />
+  <property environment="env" />
+  <property name="sdk.dir" location="${env.GAE_JAVA_SDK_HOME}" />
 
   <import file="${sdk.dir}/config/user/ant-macros.xml" />
 
