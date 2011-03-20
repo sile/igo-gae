@@ -5,6 +5,10 @@
 
 [igo]: http://igo.sourceforge.jp/
 
+## バージョン
+* igo: 0.4.2
+* igo-gae: 0.0.1
+
 ## 参照
 * [1] <http://d.hatena.ne.jp/sile/20101006/1286374552>
 * [2] <http://d.hatena.ne.jp/sile/20101018/1287409899>
