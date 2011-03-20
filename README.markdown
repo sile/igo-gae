@@ -12,12 +12,12 @@
 ## デプロイ方法
 * 前提
   * GAEのSDKがインストールされている必要がある
-  * Igoのバイナリ辞書が gae-app/war/ 直下に 'ipadic' という名前で配置されている必要がある
+  * Igoのバイナリ辞書が gae-app/igo-morp/war/ 直下に 'ipadic' という名前で配置されている必要がある
 * デプロイ
  > $ cd gae-app/igo-morp/  
- > $ GAE_JAVA_SDK_HOME=${SDKのインストールディレクトリ} ant  # アプリケーションをビルドする  
- > $ appcfg.sh update war  # a] 本番にデプロイする場合  
- > $ dev_appserver.sh war  # b] 開発環境で試す場合  
+ > $ export GAE_JAVA_SDK_HOME=${SDKのインストールディレクトリ} ant  # アプリケーションをビルドする  
+ > $ $GAE_JAVA_SDK_HOME/bin/appcfg.sh update war  # a] 本番にデプロイする場合  
+ > $ $GAE_JAVA_SDK_HOME/bin/dev_appserver.sh war  # b] 開発環境で試す場合  
 
 ## Igoの辞書作成方法
 * [Igoのドキュメント][igo] で説明されている方法で作成可能
