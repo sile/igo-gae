@@ -1,6 +1,6 @@
 diff -crN igo-0.4.2-src/src/net/reduls/igo/dictionary/WordDic.java igo-0.4.2-gae/src/net/reduls/igo/dictionary/WordDic.java
 *** igo-0.4.2-src/src/net/reduls/igo/dictionary/WordDic.java	2010-03-29 09:25:40.000000000 +0900
---- igo-0.4.2-gae/src/net/reduls/igo/dictionary/WordDic.java	2010-10-07 12:58:27.000000000 +0900
+--- igo-0.4.2-gae/src/net/reduls/igo/dictionary/WordDic.java	2011-03-20 22:22:26.649173305 +0900
 ***************
 *** 17,23 ****
   
@@ -22,7 +22,7 @@ diff -crN igo-0.4.2-src/src/net/reduls/igo/dictionary/WordDic.java igo-0.4.2-gae
   	{
 diff -crN igo-0.4.2-src/src/net/reduls/igo/dictionary/build/WordDic.java igo-0.4.2-gae/src/net/reduls/igo/dictionary/build/WordDic.java
 *** igo-0.4.2-src/src/net/reduls/igo/dictionary/build/WordDic.java	2010-03-29 18:35:02.000000000 +0900
---- igo-0.4.2-gae/src/net/reduls/igo/dictionary/build/WordDic.java	2010-10-07 13:18:09.000000000 +0900
+--- igo-0.4.2-gae/src/net/reduls/igo/dictionary/build/WordDic.java	2011-03-20 22:22:26.649173305 +0900
 ***************
 *** 131,143 ****
   	}
@@ -58,27 +58,39 @@ diff -crN igo-0.4.2-src/src/net/reduls/igo/dictionary/build/WordDic.java igo-0.4
   	{ 
 diff -crN igo-0.4.2-src/src/net/reduls/igo/util/FileMappedInputStream.java igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedInputStream.java
 *** igo-0.4.2-src/src/net/reduls/igo/util/FileMappedInputStream.java	2010-03-29 18:35:02.000000000 +0900
---- igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedInputStream.java	2010-10-09 18:57:47.662956449 +0900
+--- igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedInputStream.java	2011-03-20 23:25:20.548548785 +0900
 ***************
-*** 6,35 ****
-  import java.nio.ByteOrder;
+*** 3,9 ****
+  import java.io.IOException;
+  import java.io.FileInputStream;
+  import java.nio.ByteBuffer;
+- import java.nio.ByteOrder;
   import java.nio.channels.FileChannel;
   
   /**
-   * ファイルにマッピングされた入力ストリーム<br />
-   * net.reduls.igo以下のパッケージではファイルからバイナリデータを取得する場合、必ずこのクラスが使用される
+--- 3,8 ----
+***************
+*** 12,18 ****
    */
   public final class FileMappedInputStream {
-!     private final FileChannel cnl;
+      private final FileChannel cnl;
 !     private int cur=0;
-! 
+  
       /**
        * 入力ストリームを作成する
-       * 
-       * @param filepath マッピングするファイルのパス
+--- 11,17 ----
+   */
+  public final class FileMappedInputStream {
+      private final FileChannel cnl;
+!     private final ByteBuffer buf;
+  
+      /**
+       * 入力ストリームを作成する
+***************
+*** 21,35 ****
        */
       public FileMappedInputStream(String filepath) throws IOException {
-! 	cnl = new FileInputStream(filepath).getChannel();
+  	cnl = new FileInputStream(filepath).getChannel();
       }
   
       public int getInt() throws IOException {
@@ -91,54 +103,28 @@ diff -crN igo-0.4.2-src/src/net/reduls/igo/util/FileMappedInputStream.java igo-0
   	return ary;
       }
       
---- 6,50 ----
-  import java.nio.ByteOrder;
-  import java.nio.channels.FileChannel;
-  
-+ import java.io.File;
-+ import java.io.DataInputStream;
-+ import java.io.BufferedInputStream;
-+ import java.io.EOFException;
-+ import java.util.zip.GZIPInputStream;
-+ 
-  /**
-   * ファイルにマッピングされた入力ストリーム<br />
-   * net.reduls.igo以下のパッケージではファイルからバイナリデータを取得する場合、必ずこのクラスが使用される
-   */
-  public final class FileMappedInputStream {
-!     private final DataInputStream dis;
-!     private final int fileSize;
-      /**
-       * 入力ストリームを作成する
-       * 
-       * @param filepath マッピングするファイルのパス
+--- 20,38 ----
        */
       public FileMappedInputStream(String filepath) throws IOException {
-!         dis = new DataInputStream(new BufferedInputStream(new FileInputStream(filepath)));
-!         fileSize = (int)new File(filepath).length();
+  	cnl = new FileInputStream(filepath).getChannel();
++         buf = ByteBuffer.allocateDirect(size());
++         cnl.read(buf);
++         buf.flip();
       }
   
       public int getInt() throws IOException {
-!         return dis.readInt();
-!     }
-! 
-!     public short getShort() throws IOException {
-!         return dis.readShort();
-!     }
-! 
-!     public char getChar() throws IOException {
-!         return dis.readChar();
+! 	return buf.getInt();
       }
       
       public int[] getIntArray(int elementCount) throws IOException {
   	final int[] ary = new int[elementCount];
-!         for(int i=0; i < elementCount; i++)
-!             ary[i] = getInt();
+! 	buf.asIntBuffer().get(ary);
+!         increment(elementCount*4);
   	return ary;
       }
       
 ***************
-*** 44,84 ****
+*** 44,61 ****
   
       public short[] getShortArray(int elementCount) throws IOException {
   	final short[] ary = new short[elementCount];
@@ -157,80 +143,51 @@ diff -crN igo-0.4.2-src/src/net/reduls/igo/util/FileMappedInputStream.java igo-0
       }
   
       public static String getString(String filepath) throws IOException {
-  	final FileMappedInputStream fmis = new FileMappedInputStream(filepath);
-  	try {
-! 	    return fmis.getString(fmis.size()/2);
-  	} finally {
-  	    fmis.close();
-  	}
-      }
-  
-      public int size() throws IOException {
-! 	return (int)cnl.size();
-      }
-  
-      public void close() {
-  	try {
-! 	    cnl.close();
-  	} catch (IOException e) {}
-      }
-! 
-!     private ByteBuffer map(int size) throws IOException {
-! 	cur += size;
-! 	return cnl.map(FileChannel.MapMode.READ_ONLY, cur-size, size).order(ByteOrder.nativeOrder());
-!     }
-! }
-\ ファイル末尾に改行がありません
---- 59,104 ----
+--- 47,68 ----
   
       public short[] getShortArray(int elementCount) throws IOException {
   	final short[] ary = new short[elementCount];
-!         for(int i=0; i < elementCount; i++)
-!             ary[i] = getShort();
+! 	buf.asShortBuffer().get(ary);
+!         increment(elementCount*2);
   	return ary;
       }
   
       public char[] getCharArray(int elementCount) throws IOException {
   	final char[] ary = new char[elementCount];
-!         for(int i=0; i < elementCount; i++)
-!             ary[i] = getChar();
+! 	buf.asCharBuffer().get(ary);
+!         increment(elementCount*2);
   	return ary;
       }
   
       public String getString(int elementCount) throws IOException {
-!         StringBuilder sb = new StringBuilder(elementCount);
-!         for(int i=0; i < elementCount; i++)
-!             sb.append(dis.readChar());
-!         return sb.toString();
+! 	String tmp = buf.asCharBuffer().toString();
+!         increment(elementCount*2);
+!         return tmp;
       }
   
       public static String getString(String filepath) throws IOException {
-  	final FileMappedInputStream fmis = new FileMappedInputStream(filepath);
-  	try {
-!             StringBuilder sb = new StringBuilder(fmis.size());
-!             try {
-!                 for(;;)
-!                     sb.append(fmis.getChar());
-!             } catch (EOFException e) {}
-!             return sb.toString();
-  	} finally {
-  	    fmis.close();
-  	}
-      }
-  
-      public int size() throws IOException {
-! 	return fileSize;
-      }
-  
-      public void close() {
-  	try {
-! 	    dis.close();
+***************
+*** 77,84 ****
   	} catch (IOException e) {}
+      }
+  
+!     private ByteBuffer map(int size) throws IOException {
+! 	cur += size;
+! 	return cnl.map(FileChannel.MapMode.READ_ONLY, cur-size, size).order(ByteOrder.nativeOrder());
+      }
+! }
+\ ファイル末尾に改行がありません
+--- 84,90 ----
+  	} catch (IOException e) {}
+      }
+  
+!     private void increment(int size) {
+!         buf.position(buf.position()+size);
       }
 ! }
 diff -crN igo-0.4.2-src/src/net/reduls/igo/util/FileMappedOutputStream.java igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedOutputStream.java
 *** igo-0.4.2-src/src/net/reduls/igo/util/FileMappedOutputStream.java	2010-03-29 18:35:02.000000000 +0900
---- igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedOutputStream.java	2010-10-06 17:22:58.000000000 +0900
+--- igo-0.4.2-gae/src/net/reduls/igo/util/FileMappedOutputStream.java	2011-03-20 22:22:26.649173305 +0900
 ***************
 *** 26,32 ****
   	final FileChannel cnl = new RandomAccessFile(filepath,"rw").getChannel();
@@ -248,4 +205,3 @@ diff -crN igo-0.4.2-src/src/net/reduls/igo/util/FileMappedOutputStream.java igo-
   	} finally {
   	    cnl.close();
   	}
-
